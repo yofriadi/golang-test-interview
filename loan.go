@@ -10,6 +10,54 @@ import (
 	"github.com/julienschmidt/httprouter"
 )
 
+func handleGetAllLoan(
+	ctx context.Context,
+	conn *pgxpool.Pool,
+) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		rows, err := conn.Query(ctx, `SELECT * FROM loans;`)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer rows.Close()
+
+		type response struct {
+			ID                      int     `json:"id"`
+			UserID                  int     `json:"userId"`
+			Amount                  int     `json:"amount"`
+			Status                  string  `json:"status"`
+			ImageURLBorrowerVisited *string `json:"imageUrlBorrowerVisited"`
+			ApprovedBy              *int    `json:"approvedBy"`
+			AgreementLetterURL      *string `json:"agreementLetterURL"`
+			DisbursedBy             *int    `json:"disbursedBy"`
+		}
+		var res []response
+		for rows.Next() {
+			var r response
+			if err := rows.Scan(
+				&r.ID,
+				&r.UserID,
+				&r.Amount,
+				&r.Status,
+				&r.ImageURLBorrowerVisited,
+				&r.ApprovedBy,
+				&r.AgreementLetterURL,
+				&r.DisbursedBy,
+			); err != nil {
+				log.Fatal(err)
+			}
+			res = append(res, r)
+		}
+		if err := rows.Err(); err != nil {
+			log.Fatal(err)
+		}
+
+		w.WriteHeader(http.StatusOK)
+		w.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(w).Encode(res)
+	}
+}
+
 func handleCreateLoan(
 	ctx context.Context,
 	conn *pgxpool.Pool,

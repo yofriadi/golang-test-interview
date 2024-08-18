@@ -21,6 +21,7 @@ func main() {
 	router := httprouter.New()
 	router.POST("/user", handleCreateUser(ctx, conn))
 	router.POST("/loan", handleCreateLoan(ctx, conn))
+	router.GET("/loan", handleGetAllLoan(ctx, conn))
 	router.POST("/loan/:id/approve", handleApproveLoan(ctx, conn))
 	router.POST("/loan/:id/invest", handleInvestLoan(ctx, conn))
 	router.POST("/loan/:id/disburse", handleDisburseLoan(ctx, conn))

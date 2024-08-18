@@ -65,6 +65,12 @@ curl --location 'http://localhost:8123/loan/1/disburse' \
 }'
 ```
 
+get all loans
+
+```bash
+curl --location 'http://localhost:8123/loan'
+```
+
 ### Notes
 
 it is a bare minimum mvp, needs to add locks, transactions, etc. it is far from perfect, but you get the idea.
